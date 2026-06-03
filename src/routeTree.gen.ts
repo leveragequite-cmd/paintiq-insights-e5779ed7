@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ProcurementRouteImport } from './routes/procurement'
 import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SalesRoute = SalesRouteImport.update({
@@ -29,6 +30,11 @@ const InventoryRoute = InventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinanceRoute = FinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
   '/sales': typeof SalesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
   '/sales': typeof SalesRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
   '/sales': typeof SalesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/inventory' | '/procurement' | '/sales'
+  fullPaths: '/' | '/finance' | '/inventory' | '/procurement' | '/sales'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/inventory' | '/procurement' | '/sales'
-  id: '__root__' | '/' | '/inventory' | '/procurement' | '/sales'
+  to: '/' | '/finance' | '/inventory' | '/procurement' | '/sales'
+  id: '__root__' | '/' | '/finance' | '/inventory' | '/procurement' | '/sales'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FinanceRoute: typeof FinanceRoute
   InventoryRoute: typeof InventoryRoute
   ProcurementRoute: typeof ProcurementRoute
   SalesRoute: typeof SalesRoute
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/finance': {
+      id: '/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof FinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FinanceRoute: FinanceRoute,
   InventoryRoute: InventoryRoute,
   ProcurementRoute: ProcurementRoute,
   SalesRoute: SalesRoute,
