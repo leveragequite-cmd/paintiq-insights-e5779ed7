@@ -14,6 +14,7 @@ import { Route as SalesRouteImport } from './routes/sales'
 import { Route as ProcurementRouteImport } from './routes/procurement'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as FinanceRouteImport } from './routes/finance'
+import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SuppliersRoute = SuppliersRouteImport.update({
@@ -41,6 +42,11 @@ const FinanceRoute = FinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomersRoute = CustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,6 +55,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/customers': typeof CustomersRoute
   '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/customers': typeof CustomersRoute
   '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/customers': typeof CustomersRoute
   '/finance': typeof FinanceRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
@@ -76,16 +85,25 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/customers'
     | '/finance'
     | '/inventory'
     | '/procurement'
     | '/sales'
     | '/suppliers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/finance' | '/inventory' | '/procurement' | '/sales' | '/suppliers'
+  to:
+    | '/'
+    | '/customers'
+    | '/finance'
+    | '/inventory'
+    | '/procurement'
+    | '/sales'
+    | '/suppliers'
   id:
     | '__root__'
     | '/'
+    | '/customers'
     | '/finance'
     | '/inventory'
     | '/procurement'
@@ -95,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CustomersRoute: typeof CustomersRoute
   FinanceRoute: typeof FinanceRoute
   InventoryRoute: typeof InventoryRoute
   ProcurementRoute: typeof ProcurementRoute
@@ -139,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customers': {
+      id: '/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CustomersRoute: CustomersRoute,
   FinanceRoute: FinanceRoute,
   InventoryRoute: InventoryRoute,
   ProcurementRoute: ProcurementRoute,
