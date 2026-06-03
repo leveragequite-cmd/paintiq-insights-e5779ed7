@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuppliersRouteImport } from './routes/suppliers'
 import { Route as SalesRouteImport } from './routes/sales'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProcurementRouteImport } from './routes/procurement'
 import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForecastingRouteImport } from './routes/forecasting'
@@ -27,6 +28,11 @@ const SuppliersRoute = SuppliersRouteImport.update({
 const SalesRoute = SalesRouteImport.update({
   id: '/sales',
   path: '/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProcurementRoute = ProcurementRouteImport.update({
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/forecasting': typeof ForecastingRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
+  '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
   '/suppliers': typeof SuppliersRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/forecasting': typeof ForecastingRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
+  '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
   '/suppliers': typeof SuppliersRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/forecasting': typeof ForecastingRoute
   '/inventory': typeof InventoryRoute
   '/procurement': typeof ProcurementRoute
+  '/reports': typeof ReportsRoute
   '/sales': typeof SalesRoute
   '/suppliers': typeof SuppliersRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/forecasting'
     | '/inventory'
     | '/procurement'
+    | '/reports'
     | '/sales'
     | '/suppliers'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/forecasting'
     | '/inventory'
     | '/procurement'
+    | '/reports'
     | '/sales'
     | '/suppliers'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/forecasting'
     | '/inventory'
     | '/procurement'
+    | '/reports'
     | '/sales'
     | '/suppliers'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   ForecastingRoute: typeof ForecastingRoute
   InventoryRoute: typeof InventoryRoute
   ProcurementRoute: typeof ProcurementRoute
+  ReportsRoute: typeof ReportsRoute
   SalesRoute: typeof SalesRoute
   SuppliersRoute: typeof SuppliersRoute
 }
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/sales'
       fullPath: '/sales'
       preLoaderRoute: typeof SalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/procurement': {
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForecastingRoute: ForecastingRoute,
   InventoryRoute: InventoryRoute,
   ProcurementRoute: ProcurementRoute,
+  ReportsRoute: ReportsRoute,
   SalesRoute: SalesRoute,
   SuppliersRoute: SuppliersRoute,
 }
