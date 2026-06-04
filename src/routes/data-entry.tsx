@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, Plus, X, ArrowUp, ArrowDown } from "lucide-react";
-import {
-  useData, BRANDS, CATEGORIES, SIZES, PAYMENT_MODES, EXPENSE_CATEGORIES, PRICE_REASONS,
-  type InvoiceItem,
-} from "@/lib/data-store";
+import { useData, type InvoiceItem, type DocumentImport } from "@/lib/data-store";
+import { BRANDS, CATEGORIES, SIZES, PAYMENT_MODES, EXPENSE_CATEGORIES, PRICE_REASONS } from "@/lib/constants";
+import { ingestBusinessDocument } from "@/lib/api/gemini.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/data-entry")({
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/data-entry")({
   component: DataEntryPage,
 });
 
-const TABS = ["Stock In", "Sales", "Purchase Invoice", "Expenses", "Price Update"] as const;
+const TABS = ["Stock In", "Sales", "Purchase Invoice", "Expenses", "Price Update", "Import Data"] as const;
 type Tab = (typeof TABS)[number];
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -31,6 +31,145 @@ function Field({ label, required, error, children }: { label: string; required?:
       <label className={labelBase}>{label}{required && <Req />}</label>
       {children}
       {error && <div className="mt-1 text-xs text-destructive">{error}</div>}
+    </div>
+  );
+}
+
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (!result || typeof result !== "string") return reject(new Error("Unable to read file."));
+      const [, base64] = result.split(",", 2);
+      resolve(base64 ?? "");
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
+  const { state, dispatch } = useData();
+  const ingestDocument = useServerFn(ingestBusinessDocument);
+  const [file, setFile] = useState<File | null>(null);
+  const [result, setResult] = useState<DocumentImport | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    setResult(null);
+    setFile(event.target.files?.[0] ?? null);
+  };
+
+  const handleAnalyze = async () => {
+    if (!file) {
+      setError("Please choose an Excel or image file first.");
+      return;
+    }
+
+    setError(null);
+    setImporting(true);
+    try {
+      const contentBase64 = await fileToBase64(file);
+      const parsed = await ingestDocument({ data: {
+        fileName: file.name,
+        mimeType: file.type || "application/octet-stream",
+        contentBase64,
+      } });
+      setResult(parsed);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Import failed.");
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleSaveImport = () => {
+    if (!result) return;
+    setSaveLoading(true);
+    setTimeout(() => {
+      dispatch({ type: "ADD_DOCUMENT_IMPORT", payload: result });
+      setSaveLoading(false);
+      toast.success("Import saved successfully.");
+      onSaved(new Date().toLocaleString("en-IN"));
+      setFile(null);
+      setResult(null);
+    }, 400);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="surface-card p-6 space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-base font-semibold">Import Data</h3>
+            <p className="text-sm text-muted-foreground">Upload Excel or image files and PaintIQ will classify and summarize the contents.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <label className="cursor-pointer rounded-xl border border-border bg-secondary/40 px-4 py-2 text-sm text-foreground hover:bg-secondary">
+              Choose file
+              <input type="file" accept=".xlsx,.xls,image/*" className="hidden" onChange={onFileChange} />
+            </label>
+            <button
+              type="button"
+              onClick={handleAnalyze}
+              disabled={!file || importing}
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            >
+              {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Analyze"}
+            </button>
+          </div>
+        </div>
+
+        {file && <div className="text-sm text-muted-foreground">Selected file: {file.name}</div>}
+        {error && <div className="text-sm text-destructive">{error}</div>}
+
+        {result && (
+          <div className="space-y-4 rounded-2xl border border-border p-4 bg-secondary/20">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-sm font-semibold">{result.fileName}</div>
+                <div className="text-xs text-muted-foreground">Type: {result.sourceType} · Classification: {result.classification}</div>
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveImport}
+                disabled={saveLoading}
+                className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+              >
+                {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save import"}
+              </button>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Summary</div>
+                <div className="mt-2 text-sm leading-relaxed text-foreground">{result.summary}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Recommendations</div>
+                <div className="mt-2 text-sm leading-relaxed text-foreground">{result.recommendations}</div>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">Rows detected: {result.rows.length}</div>
+          </div>
+        )}
+      </div>
+
+      <RecentTable
+        title="Imported Documents"
+        columns={["File", "Type", "Classification", "Rows", "Summary"]}
+        rows={state.importedDocuments.slice(0, 10).map((doc) => [
+          doc.fileName,
+          doc.sourceType,
+          doc.classification,
+          doc.rows.length,
+          doc.summary.length > 80 ? `${doc.summary.slice(0, 80)}…` : doc.summary,
+        ])}
+      />
     </div>
   );
 }
@@ -75,6 +214,7 @@ function DataEntryPage() {
       {tab === "Purchase Invoice" && <InvoiceForm onSaved={setLastSaved} />}
       {tab === "Expenses" && <ExpenseForm onSaved={setLastSaved} />}
       {tab === "Price Update" && <PriceForm onSaved={setLastSaved} />}
+      {tab === "Import Data" && <ImportForm onSaved={setLastSaved} />}
 
       {lastSaved && (
         <div className="text-xs text-muted-foreground">Last saved: {lastSaved}</div>
