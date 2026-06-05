@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Send, Mic, Plus, Sparkles, MessageSquare, TrendingDown, AlertTriangle, Lightbulb } from "lucide-react";
+import { Send, Mic, Plus, Sparkles, MessageSquare } from "lucide-react";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({ meta: [{ title: "AI Business Assistant — PaintIQ" }] }),
@@ -16,18 +16,9 @@ const suggestions = [
   "Which supplier is hurting my margins most?",
 ];
 
-const conversations = [
-  "Q3 profit analysis",
-  "Dead stock review",
-  "Supplier renegotiation plan",
-  "Festive season inventory",
-];
+const conversations: string[] = [];
 
-const insights = [
-  { icon: TrendingDown, tone: "critical", title: "Margin erosion detected", text: "Apex Paints price hikes have shaved 3.4% off your exterior paint margins over 6 weeks." },
-  { icon: AlertTriangle, tone: "warning", title: "Stock-out imminent", text: "Opus Premium Enamel 1L will hit zero in 9 days at current velocity." },
-  { icon: Lightbulb, tone: "positive", title: "Pricing opportunity", text: "Royale Luxury 4L can absorb a 4% sell-price increase based on demand elasticity." },
-];
+const insights: { tone: string; title: string; text: string }[] = [];
 
 function AssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -45,7 +36,7 @@ function AssistantPage() {
     setTimeout(() => {
       setMessages((m) => [
         ...m,
-        { role: "ai", text: "Based on your last 90 days of data, I'd flag 3 SKUs aging past 120 days representing ₹1.1L of working capital. I can draft a clearance plan if you'd like." },
+        { role: "ai", text: "I don't have enough business data yet. Please add stock, sales and expenses in the Data Entry tab so I can give you real insights." },
       ]);
     }, 600);
   };
@@ -57,21 +48,20 @@ function AssistantPage() {
         <p className="text-sm text-muted-foreground mt-1">Ask PaintIQ AI anything about your shop's performance.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {insights.map((i, k) => {
-          const Icon = i.icon;
-          return (
+      {insights.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {insights.map((i, k) => (
             <div key={k} className="surface-card p-5">
               <div className={`flex items-center gap-2 mb-2 ${i.tone === "critical" ? "text-destructive" : i.tone === "warning" ? "text-amber-400" : "text-primary"}`}>
-                <Icon className="h-4 w-4" />
+                <Sparkles className="h-4 w-4" />
                 <span className="text-xs uppercase tracking-wider">Proactive Insight</span>
               </div>
               <div className="text-sm font-semibold">{i.title}</div>
               <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{i.text}</div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 h-[calc(100vh-360px)] min-h-[480px]">
         <aside className="surface-card p-4 flex flex-col gap-2">

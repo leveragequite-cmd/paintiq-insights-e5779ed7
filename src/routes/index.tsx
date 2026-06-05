@@ -149,8 +149,8 @@ function Dashboard() {
               <PolarGrid stroke="rgba(255,255,255,0.1)" />
               <PolarAngleAxis dataKey="metric" stroke="#94A3B8" fontSize={11} />
               <PolarRadiusAxis stroke="#94A3B8" fontSize={10} />
-              <Radar name="Sharma Distributors" dataKey="A" stroke="#00F2FE" fill="#00F2FE" fillOpacity={0.3} />
-              <Radar name="Apex Wholesale" dataKey="B" stroke="#FF5A5A" fill="#FF5A5A" fillOpacity={0.2} />
+              <Radar name="Supplier A" dataKey="A" stroke="#00F2FE" fill="#00F2FE" fillOpacity={0.3} />
+              <Radar name="Supplier B" dataKey="B" stroke="#FF5A5A" fill="#FF5A5A" fillOpacity={0.2} />
               <Legend wrapperStyle={{ fontSize: 11, color: "#94A3B8" }} />
             </RadarChart>
           </ResponsiveContainer>
