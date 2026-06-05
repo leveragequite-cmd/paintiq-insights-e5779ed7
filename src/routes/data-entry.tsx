@@ -50,7 +50,7 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
-  const { state, dispatch } = useData();
+  const { dispatch } = useData();
   const ingestDocument = useServerFn(ingestBusinessDocument);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<DocumentImport | null>(null);
