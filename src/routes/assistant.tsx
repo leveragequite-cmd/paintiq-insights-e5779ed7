@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Send, Mic, Plus, Sparkles, MessageSquare, TrendingDown, AlertTriangle, Lightbulb } from "lucide-react";
+import { Send, Mic, Plus, Sparkles, MessageSquare } from "lucide-react";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({ meta: [{ title: "AI Business Assistant — PaintIQ" }] }),
@@ -16,18 +16,9 @@ const suggestions = [
   "Which supplier is hurting my margins most?",
 ];
 
-const conversations = [
-  "Q3 profit analysis",
-  "Dead stock review",
-  "Supplier renegotiation plan",
-  "Festive season inventory",
-];
+const conversations: string[] = [];
 
-const insights = [
-  { icon: TrendingDown, tone: "critical", title: "Margin erosion detected", text: "Apex Paints price hikes have shaved 3.4% off your exterior paint margins over 6 weeks." },
-  { icon: AlertTriangle, tone: "warning", title: "Stock-out imminent", text: "Opus Premium Enamel 1L will hit zero in 9 days at current velocity." },
-  { icon: Lightbulb, tone: "positive", title: "Pricing opportunity", text: "Royale Luxury 4L can absorb a 4% sell-price increase based on demand elasticity." },
-];
+const insights: { tone: string; title: string; text: string }[] = [];
 
 function AssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
