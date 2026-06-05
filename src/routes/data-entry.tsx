@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Plus, X, ArrowUp, ArrowDown } from "lucide-react";
+import { Loader2, Plus, X, ArrowUp, ArrowDown, Undo2 } from "lucide-react";
 import { useData, type InvoiceItem, type DocumentImport } from "@/lib/data-store";
 import { BRANDS, CATEGORIES, SIZES, PAYMENT_MODES, EXPENSE_CATEGORIES, PRICE_REASONS } from "@/lib/constants";
 import { ingestBusinessDocument } from "@/lib/api/gemini.functions";
