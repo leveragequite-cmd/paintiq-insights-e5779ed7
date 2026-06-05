@@ -79,7 +79,7 @@ function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
         mimeType: file.type || "application/octet-stream",
         contentBase64,
       } });
-      setResult(parsed);
+      setResult({ ...parsed, timestamp: new Date().toISOString() });
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "Import failed.");
