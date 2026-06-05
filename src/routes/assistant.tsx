@@ -48,21 +48,20 @@ function AssistantPage() {
         <p className="text-sm text-muted-foreground mt-1">Ask PaintIQ AI anything about your shop's performance.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {insights.map((i, k) => {
-          const Icon = i.icon;
-          return (
+      {insights.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {insights.map((i, k) => (
             <div key={k} className="surface-card p-5">
               <div className={`flex items-center gap-2 mb-2 ${i.tone === "critical" ? "text-destructive" : i.tone === "warning" ? "text-amber-400" : "text-primary"}`}>
-                <Icon className="h-4 w-4" />
+                <Sparkles className="h-4 w-4" />
                 <span className="text-xs uppercase tracking-wider">Proactive Insight</span>
               </div>
               <div className="text-sm font-semibold">{i.title}</div>
               <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{i.text}</div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 h-[calc(100vh-360px)] min-h-[480px]">
         <aside className="surface-card p-4 flex flex-col gap-2">
