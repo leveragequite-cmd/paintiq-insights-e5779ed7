@@ -76,6 +76,14 @@ export type PriceChange = {
   notes?: string;
 };
 
+export type ImportedIds = {
+  stock?: string[];
+  sales?: string[];
+  invoices?: string[];
+  expenses?: string[];
+  prices?: string[];
+};
+
 export type DocumentImport = {
   id: string;
   fileName: string;
@@ -84,6 +92,8 @@ export type DocumentImport = {
   summary: string;
   recommendations: string;
   rows: Array<Record<string, unknown>>;
+  timestamp: string;
+  createdIds?: ImportedIds;
 };
 
 type State = {
