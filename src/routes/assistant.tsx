@@ -36,7 +36,7 @@ function AssistantPage() {
     setTimeout(() => {
       setMessages((m) => [
         ...m,
-        { role: "ai", text: "Based on your last 90 days of data, I'd flag 3 SKUs aging past 120 days representing ₹1.1L of working capital. I can draft a clearance plan if you'd like." },
+        { role: "ai", text: "I don't have enough business data yet. Please add stock, sales and expenses in the Data Entry tab so I can give you real insights." },
       ]);
     }, 600);
   };
