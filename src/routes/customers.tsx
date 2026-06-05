@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useData } from "@/lib/data-store";
 import { EmptyState } from "@/components/empty-state";
+import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/customers")({
   head: () => ({ meta: [{ title: "Customers — PaintIQ" }] }),
@@ -12,37 +13,29 @@ function CustomersPage() {
   const { state } = useData();
 
   const customers = useMemo(() => {
-    const map = new Map<string, { name: string; purchases: number; lifetime: number; last: string }>();
+    const map: Record<string, { name: string; purchases: number; lifetime: number; last: string }> = {};
     state.salesEntries.forEach((s) => {
-      const key = s.customer || "Walk-in";
-      const entry = map.get(key) ?? { name: key, purchases: 0, lifetime: 0, last: s.date };
-      entry.purchases += 1;
-      entry.lifetime += s.total;
-      if (s.date > entry.last) entry.last = s.date;
-      map.set(key, entry);
+      if (!map[s.customer]) map[s.customer] = { name: s.customer, purchases: 0, lifetime: 0, last: s.date };
+      map[s.customer].purchases += 1;
+      map[s.customer].lifetime += s.total;
+      if (s.date > map[s.customer].last) map[s.customer].last = s.date;
     });
-    return Array.from(map.values()).sort((a, b) => b.lifetime - a.lifetime);
+    return Object.values(map).sort((a, b) => b.lifetime - a.lifetime);
   }, [state.salesEntries]);
-
-  const totalCustomers = customers.length;
-  const totalLTV = customers.reduce((sum, c) => sum + c.lifetime, 0);
-  const avgLTV = totalCustomers ? Math.round(totalLTV / totalCustomers) : 0;
-  const thisMonth = new Date().toISOString().slice(0, 7);
-  const activeThisMonth = new Set(state.salesEntries.filter((s) => s.date.startsWith(thisMonth)).map((s) => s.customer || "Walk-in")).size;
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
-        <p className="text-sm text-muted-foreground mt-1">Derived from your sales entries.</p>
+        <p className="text-sm text-muted-foreground mt-1">Contractor, designer and retail buyer relationships.</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { l: "Total Customers", v: totalCustomers.toString() },
-          { l: "Active This Month", v: activeThisMonth.toString() },
-          { l: "Avg LTV", v: avgLTV ? `₹${avgLTV.toLocaleString("en-IN")}` : "—" },
-          { l: "Total Revenue", v: totalLTV ? `₹${totalLTV.toLocaleString("en-IN")}` : "—" },
+          { l: "Total Customers", v: customers.length.toString() },
+          { l: "Transactions", v: state.salesEntries.length.toString() },
+          { l: "Total Revenue", v: customers.length > 0 ? "₹" + customers.reduce((s, c) => s + c.lifetime, 0).toLocaleString("en-IN") : "—" },
+          { l: "Avg LTV", v: customers.length > 0 ? "₹" + Math.round(customers.reduce((s, c) => s + c.lifetime, 0) / customers.length).toLocaleString("en-IN") : "—" },
         ].map((k) => (
           <div key={k.l} className="surface-card p-5">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{k.l}</div>
@@ -56,7 +49,9 @@ function CustomersPage() {
           <h3 className="text-sm font-semibold">Top Customers</h3>
         </div>
         {customers.length === 0 ? (
-          <EmptyState title="No customers yet" subtitle="Record sales to populate this list." />
+          <div className="p-5">
+            <EmptyState icon={Users} title="No customers yet" subtitle="Customers will appear here as you log sales." />
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

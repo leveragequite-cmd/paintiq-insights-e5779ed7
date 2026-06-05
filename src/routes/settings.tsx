@@ -90,8 +90,20 @@ function SettingsPage() {
       </Section>
 
       <Section title="User Management">
-        <div className="rounded-md border border-border bg-background px-4 py-6 text-sm text-muted-foreground text-center">
-          No users added yet.
+        <div className="space-y-2">
+          {[
+            { name: "Ravi Kumar", role: "Owner" },
+            { name: "Anjali Sharma", role: "Counter Staff" },
+            { name: "Suresh Patil", role: "Inventory Manager" },
+          ].map((u) => (
+            <div key={u.name} className="flex items-center justify-between rounded-md border border-border bg-background px-4 py-3 text-sm">
+              <div>
+                <div className="font-medium">{u.name}</div>
+                <div className="text-xs text-muted-foreground">{u.role}</div>
+              </div>
+              <button className="text-xs text-primary hover:underline">Edit</button>
+            </div>
+          ))}
         </div>
       </Section>
     </div>

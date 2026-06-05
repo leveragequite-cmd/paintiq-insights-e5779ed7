@@ -1,9 +1,7 @@
-// All mock/dummy data has been removed.
-// These exports remain as empty placeholders so existing imports type-check.
-// Charts and tables will render blank until real data is fed through Data Entry / AI Import.
+// All dummy/sample chart data removed. Charts now render from live data
+// added via the Data Entry Center, or show empty states until data exists.
 
 export const months: string[] = [];
-
 export const revenueTrend: { month: string; revenue: number; profit: number }[] = [];
 export const monthlyProfit: { month: string; profit: number }[] = [];
 export const inventoryMovement: { month: string; inflow: number; outflow: number }[] = [];

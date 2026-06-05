@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Boxes, TrendingUp, ShoppingCart, Wallet, Truck, Users,
-  LineChart, Bot, FileText, Settings as SettingsIcon, ClipboardEdit,
+  LineChart, Bot, FileText, Settings as SettingsIcon, ClipboardEdit, Wand2,
   Menu, Search, Bell, Sparkles, Activity, ChevronLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ const navItems = [
   { to: "/finance", label: "Finance Intelligence", icon: Wallet },
   { to: "/suppliers", label: "Suppliers", icon: Truck },
   { to: "/data-entry", label: "Data Entry", icon: ClipboardEdit },
+  { to: "/ai-import", label: "AI Import", icon: Wand2 },
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/forecasting", label: "Forecasting", icon: LineChart },
   { to: "/assistant", label: "AI Business Assistant", icon: Bot },
@@ -96,9 +97,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Sparkles className="h-4 w-4" /> AI Insight
             </button>
             <div className="hidden sm:flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-xs">
-              <Activity className="h-4 w-4 text-primary" />
+              <Activity className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">Health</span>
-              <span className="font-semibold text-primary">82</span>
+              <span className="font-semibold text-muted-foreground">—</span>
             </div>
             <button className="relative rounded-md p-2 hover:bg-accent" aria-label="Notifications">
               <Bell className="h-5 w-5" />

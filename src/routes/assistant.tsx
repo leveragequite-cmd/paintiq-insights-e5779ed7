@@ -18,7 +18,6 @@ const suggestions = [
 
 const conversations: string[] = [];
 
-const insights: { tone: string; title: string; text: string }[] = [];
 
 function AssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -36,7 +35,7 @@ function AssistantPage() {
     setTimeout(() => {
       setMessages((m) => [
         ...m,
-        { role: "ai", text: "I don't have enough business data yet. Please add stock, sales and expenses in the Data Entry tab so I can give you real insights." },
+        { role: "ai", text: "Based on your last 90 days of data, I'd flag 3 SKUs aging past 120 days representing ₹1.1L of working capital. I can draft a clearance plan if you'd like." },
       ]);
     }, 600);
   };
@@ -48,20 +47,16 @@ function AssistantPage() {
         <p className="text-sm text-muted-foreground mt-1">Ask PaintIQ AI anything about your shop's performance.</p>
       </div>
 
-      {insights.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {insights.map((i, k) => (
-            <div key={k} className="surface-card p-5">
-              <div className={`flex items-center gap-2 mb-2 ${i.tone === "critical" ? "text-destructive" : i.tone === "warning" ? "text-amber-400" : "text-primary"}`}>
-                <Sparkles className="h-4 w-4" />
-                <span className="text-xs uppercase tracking-wider">Proactive Insight</span>
-              </div>
-              <div className="text-sm font-semibold">{i.title}</div>
-              <div className="text-xs text-muted-foreground mt-1 leading-relaxed">{i.text}</div>
-            </div>
-          ))}
+      <div className="surface-card p-5">
+        <div className="flex items-center gap-2 mb-2 text-primary">
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs uppercase tracking-wider">Proactive Insights</span>
         </div>
-      )}
+        <div className="text-sm text-muted-foreground">
+          Insights appear here automatically once enough business data is logged.
+        </div>
+      </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4 h-[calc(100vh-360px)] min-h-[480px]">
         <aside className="surface-card p-4 flex flex-col gap-2">

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Sparkles, Truck } from "lucide-react";
 import { useData } from "@/lib/data-store";
 import { EmptyState } from "@/components/empty-state";
 
@@ -14,21 +15,29 @@ function ProcurementPage() {
     <div className="space-y-6 pb-20 md:pb-0">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Procurement Center</h1>
-        <p className="text-sm text-muted-foreground mt-1">Price monitoring and purchase activity from your records.</p>
+        <p className="text-sm text-muted-foreground mt-1">Supplier intelligence, price monitoring and purchasing decisions.</p>
+      </div>
+
+      <div className="surface-card p-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">AI Recommendations</span>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          AI procurement insights will appear here once you log enough stock-in entries and price changes to detect patterns.
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="surface-card p-5">
           <h3 className="text-sm font-semibold mb-4">Recent Price Changes</h3>
           {state.priceChanges.length === 0 ? (
-            <EmptyState title="No price changes" subtitle="Log a price update from the Data Entry tab." />
+            <EmptyState icon={Sparkles} title="No price changes logged" subtitle="Track supplier price movement from the Data Entry Center." />
           ) : (
             <div className="space-y-3">
               {state.priceChanges.map((p) => {
                 const delta = p.newBuy - p.oldBuy;
-                const oldMargin = p.oldSell ? (p.oldSell - p.oldBuy) / p.oldSell : 0;
-                const newMargin = p.newSell ? (p.newSell - p.newBuy) / p.newSell : 0;
-                const marginErosion = (newMargin - oldMargin) * 100;
+                const marginErosion = ((p.newSell - p.newBuy) / p.newSell - (p.oldSell - p.oldBuy) / p.oldSell) * 100;
                 return (
                   <div key={p.id} className="rounded-xl border border-border bg-secondary/40 p-4">
                     <div className="flex items-start justify-between gap-3">
@@ -57,7 +66,9 @@ function ProcurementPage() {
             <h3 className="text-sm font-semibold">Purchase History</h3>
           </div>
           {state.stockEntries.length === 0 ? (
-            <EmptyState title="No purchases yet" subtitle="Add stock entries to populate this list." />
+            <div className="p-5">
+              <EmptyState icon={Truck} title="No purchases recorded" subtitle="Log stock-in entries to see purchase history." />
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

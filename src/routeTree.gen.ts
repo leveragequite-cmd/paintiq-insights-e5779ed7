@@ -20,6 +20,7 @@ import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as DataEntryRouteImport } from './routes/data-entry'
 import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as AssistantRouteImport } from './routes/assistant'
+import { Route as AiImportRouteImport } from './routes/ai-import'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SuppliersRoute = SuppliersRouteImport.update({
@@ -77,6 +78,11 @@ const AssistantRoute = AssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiImportRoute = AiImportRouteImport.update({
+  id: '/ai-import',
+  path: '/ai-import',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -85,6 +91,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/assistant': typeof AssistantRoute
   '/customers': typeof CustomersRoute
   '/data-entry': typeof DataEntryRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/assistant': typeof AssistantRoute
   '/customers': typeof CustomersRoute
   '/data-entry': typeof DataEntryRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/assistant': typeof AssistantRoute
   '/customers': typeof CustomersRoute
   '/data-entry': typeof DataEntryRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-import'
     | '/assistant'
     | '/customers'
     | '/data-entry'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-import'
     | '/assistant'
     | '/customers'
     | '/data-entry'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-import'
     | '/assistant'
     | '/customers'
     | '/data-entry'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiImportRoute: typeof AiImportRoute
   AssistantRoute: typeof AssistantRoute
   CustomersRoute: typeof CustomersRoute
   DataEntryRoute: typeof DataEntryRoute
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-import': {
+      id: '/ai-import'
+      path: '/ai-import'
+      fullPath: '/ai-import'
+      preLoaderRoute: typeof AiImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -277,6 +297,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiImportRoute: AiImportRoute,
   AssistantRoute: AssistantRoute,
   CustomersRoute: CustomersRoute,
   DataEntryRoute: DataEntryRoute,
