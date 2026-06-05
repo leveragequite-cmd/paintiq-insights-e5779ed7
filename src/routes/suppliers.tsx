@@ -41,7 +41,7 @@ function SuppliersPage() {
       </div>
 
       {suppliers.length === 0 ? (
-        <EmptyState title="No suppliers yet" description="Add stock entries or purchase invoices to populate this list." />
+        <EmptyState title="No suppliers yet" subtitle="Add stock entries or purchase invoices to populate this list." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {suppliers.map((s) => (
