@@ -14,7 +14,7 @@ export type ParsedDocument = {
   classification: string;
   rawText: string;
   summary: string;
-  rows: Array<Record<string, unknown>>;
+  rows: Array<Record<string, string | number | boolean | null>>;
   recommendations: string;
 };
 
@@ -72,7 +72,7 @@ function parseExcelBuffer(buffer: Buffer) {
   return workbook.SheetNames.map((sheetName) => {
     const sheet = workbook.Sheets[sheetName];
     const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }) as Array<Array<string | number | boolean>>;
-    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" }) as Array<Record<string, unknown>>;
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" }) as Array<Record<string, string | number | boolean | null>>;
     return { sheetName, rawRows, rows };
   });
 }
@@ -102,7 +102,7 @@ export const ingestBusinessDocument = createServerFn({ method: "POST" })
     const isImage = data.mimeType.startsWith("image/") || /(png|jpe?g|bmp|tiff|webp)$/i.test(lowerName);
 
     let rawText = "";
-    let rows: Array<Record<string, unknown>> = [];
+    let rows: Array<Record<string, string | number | boolean | null>> = [];
     let sourceType: ParsedDocument["sourceType"] = "unknown";
 
     if (isExcel) {

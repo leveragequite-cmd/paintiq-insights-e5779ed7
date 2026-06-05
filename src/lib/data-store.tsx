@@ -91,7 +91,7 @@ export type DocumentImport = {
   classification: string;
   summary: string;
   recommendations: string;
-  rows: Array<Record<string, unknown>>;
+  rows: Array<Record<string, string | number | boolean | null>>;
   timestamp: string;
   createdIds?: ImportedIds;
 };
