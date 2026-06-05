@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Plus, X, ArrowUp, ArrowDown } from "lucide-react";
+import { Loader2, Plus, X, ArrowUp, ArrowDown, Undo2 } from "lucide-react";
 import { useData, type InvoiceItem, type DocumentImport } from "@/lib/data-store";
 import { BRANDS, CATEGORIES, SIZES, PAYMENT_MODES, EXPENSE_CATEGORIES, PRICE_REASONS } from "@/lib/constants";
 import { ingestBusinessDocument } from "@/lib/api/gemini.functions";
@@ -50,7 +50,7 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
-  const { state, dispatch } = useData();
+  const { dispatch } = useData();
   const ingestDocument = useServerFn(ingestBusinessDocument);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<DocumentImport | null>(null);
@@ -79,7 +79,7 @@ function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
         mimeType: file.type || "application/octet-stream",
         contentBase64,
       } });
-      setResult(parsed);
+      setResult({ ...parsed, timestamp: new Date().toISOString() });
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "Import failed.");
@@ -159,17 +159,88 @@ function ImportForm({ onSaved }: { onSaved: (s: string) => void }) {
         )}
       </div>
 
-      <RecentTable
-        title="Imported Documents"
-        columns={["File", "Type", "Classification", "Rows", "Summary"]}
-        rows={state.importedDocuments.slice(0, 10).map((doc) => [
-          doc.fileName,
-          doc.sourceType,
-          doc.classification,
-          doc.rows.length,
-          doc.summary.length > 80 ? `${doc.summary.slice(0, 80)}…` : doc.summary,
-        ])}
-      />
+      <ImportHistoryPanel />
+    </div>
+  );
+}
+
+function ImportHistoryPanel() {
+  const { state, dispatch } = useData();
+  const history = state.importedDocuments;
+  const lastId = history[0]?.id;
+
+  const handleRevert = (id: string, fileName: string) => {
+    dispatch({ type: "REVERT_IMPORT", payload: { id } });
+    toast.success(`Reverted import: ${fileName}`);
+  };
+
+  const formatTs = (ts?: string) => {
+    if (!ts) return "—";
+    try { return new Date(ts).toLocaleString("en-IN"); } catch { return ts; }
+  };
+
+  const countAffected = (doc: typeof history[number]) => {
+    const ids = doc.createdIds ?? {};
+    return (ids.stock?.length ?? 0) + (ids.sales?.length ?? 0) + (ids.invoices?.length ?? 0) + (ids.expenses?.length ?? 0) + (ids.prices?.length ?? 0);
+  };
+
+  return (
+    <div className="surface-card overflow-hidden">
+      <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-3">
+        <div>
+          <h3 className="text-sm font-semibold">Import History</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Reverting removes the document and any live entries it added.</p>
+        </div>
+        {lastId && (
+          <button
+            type="button"
+            onClick={() => handleRevert(lastId, history[0].fileName)}
+            className="inline-flex items-center gap-2 rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/20"
+          >
+            <Undo2 className="h-3.5 w-3.5" />
+            Revert last import
+          </button>
+        )}
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
+              <th className="px-4 py-3 font-medium">When</th>
+              <th className="px-4 py-3 font-medium">File</th>
+              <th className="px-4 py-3 font-medium">Type</th>
+              <th className="px-4 py-3 font-medium">Classification</th>
+              <th className="px-4 py-3 font-medium">Rows</th>
+              <th className="px-4 py-3 font-medium">Affected</th>
+              <th className="px-4 py-3 font-medium text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.length === 0 ? (
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No imports yet</td></tr>
+            ) : history.map((doc) => (
+              <tr key={doc.id} className="border-b border-border/60">
+                <td className="px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{formatTs(doc.timestamp)}</td>
+                <td className="px-4 py-2.5">{doc.fileName}</td>
+                <td className="px-4 py-2.5 capitalize">{doc.sourceType}</td>
+                <td className="px-4 py-2.5">{doc.classification}</td>
+                <td className="px-4 py-2.5">{doc.rows.length}</td>
+                <td className="px-4 py-2.5">{countAffected(doc)}</td>
+                <td className="px-4 py-2.5 text-right">
+                  <button
+                    type="button"
+                    onClick={() => handleRevert(doc.id, doc.fileName)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/40 px-2.5 py-1.5 text-xs font-medium hover:bg-secondary"
+                  >
+                    <Undo2 className="h-3 w-3" />
+                    Revert
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

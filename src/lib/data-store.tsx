@@ -76,6 +76,14 @@ export type PriceChange = {
   notes?: string;
 };
 
+export type ImportedIds = {
+  stock?: string[];
+  sales?: string[];
+  invoices?: string[];
+  expenses?: string[];
+  prices?: string[];
+};
+
 export type DocumentImport = {
   id: string;
   fileName: string;
@@ -83,7 +91,9 @@ export type DocumentImport = {
   classification: string;
   summary: string;
   recommendations: string;
-  rows: Array<Record<string, unknown>>;
+  rows: Array<Record<string, string | number | boolean | null>>;
+  timestamp: string;
+  createdIds?: ImportedIds;
 };
 
 type State = {
@@ -101,7 +111,8 @@ type Action =
   | { type: "ADD_INVOICE"; payload: Invoice }
   | { type: "ADD_EXPENSE"; payload: Expense }
   | { type: "ADD_PRICE"; payload: PriceChange }
-  | { type: "ADD_DOCUMENT_IMPORT"; payload: DocumentImport };
+  | { type: "ADD_DOCUMENT_IMPORT"; payload: DocumentImport }
+  | { type: "REVERT_IMPORT"; payload: { id: string } };
 
 const today = (offset = 0) => {
   const d = new Date();
@@ -126,6 +137,22 @@ function reducer(state: State, action: Action): State {
     case "ADD_EXPENSE": return { ...state, expenses: [action.payload, ...state.expenses] };
     case "ADD_PRICE": return { ...state, priceChanges: [action.payload, ...state.priceChanges] };
     case "ADD_DOCUMENT_IMPORT": return { ...state, importedDocuments: [action.payload, ...state.importedDocuments] };
+    case "REVERT_IMPORT": {
+      const doc = state.importedDocuments.find((d) => d.id === action.payload.id);
+      if (!doc) return state;
+      const ids = doc.createdIds ?? {};
+      const filter = <T extends { id: string }>(list: T[], removeIds?: string[]) =>
+        removeIds && removeIds.length ? list.filter((x) => !removeIds.includes(x.id)) : list;
+      return {
+        ...state,
+        stockEntries: filter(state.stockEntries, ids.stock),
+        salesEntries: filter(state.salesEntries, ids.sales),
+        invoices: filter(state.invoices, ids.invoices),
+        expenses: filter(state.expenses, ids.expenses),
+        priceChanges: filter(state.priceChanges, ids.prices),
+        importedDocuments: state.importedDocuments.filter((d) => d.id !== action.payload.id),
+      };
+    }
     default: return state;
   }
 }
