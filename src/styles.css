@@ -8,9 +8,9 @@
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
   --radius-xl: 20px;
   --radius-2xl: 24px;
   --color-background: var(--background);
@@ -40,41 +40,37 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 8px 20px rgba(10, 123, 108, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 :root {
-  --background: #12141c;
-  --foreground: #f8fafc;
-  --card: #1e2230;
-  --card-foreground: #f8fafc;
-  --popover: #1e2230;
-  --popover-foreground: #f8fafc;
-  --primary: #00f2fe;
-  --primary-foreground: #0a0e17;
-  --secondary: #232838;
-  --secondary-foreground: #f8fafc;
-  --muted: #232838;
-  --muted-foreground: #94a3b8;
-  --accent: #232838;
-  --accent-foreground: #f8fafc;
-  --destructive: #ff5a5a;
-  --destructive-foreground: #f8fafc;
-  --border: rgba(255, 255, 255, 0.07);
-  --input: rgba(255, 255, 255, 0.07);
-  --ring: #00f2fe;
-  --positive: #00f2fe;
-  --critical: #ff5a5a;
-  --warning: #f59e0b;
-  --sidebar: #161925;
-  --sidebar-foreground: #f8fafc;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-accent: #232838;
-  --sidebar-accent-foreground: #00f2fe;
-}
-
-.dark {
-  color-scheme: dark;
+  --background: #e4f7f5;
+  --foreground: #054030;
+  --card: #ffffff;
+  --card-foreground: #054030;
+  --popover: #ffffff;
+  --popover-foreground: #054030;
+  --primary: #0a7b6c;
+  --primary-foreground: #ffffff;
+  --secondary: #d4efec;
+  --secondary-foreground: #054030;
+  --muted: #d4efec;
+  --muted-foreground: #4a7a72;
+  --accent: #c9e9e4;
+  --accent-foreground: #054030;
+  --destructive: #c0392b;
+  --destructive-foreground: #ffffff;
+  --border: rgba(10, 123, 108, 0.12);
+  --input: rgba(10, 123, 108, 0.18);
+  --ring: #0a7b6c;
+  --positive: #2d7a2d;
+  --critical: #c0392b;
+  --warning: #d97706;
+  --sidebar: #0a7b6c;
+  --sidebar-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-accent: rgba(255, 255, 255, 0.2);
+  --sidebar-accent-foreground: #ffffff;
 }
 
 @layer base {
@@ -98,9 +94,73 @@
 
 @layer components {
   .surface-card {
-    background-color: var(--color-card);
+    background-color: #ffffff;
     border: 1px solid var(--color-border);
-    border-radius: 16px;
-    box-shadow: var(--shadow-card);
+    border-radius: 14px;
+    box-shadow:
+      0 8px 20px rgba(10, 123, 108, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    color: #054030;
+  }
+  .clay-sidebar {
+    background-color: #0a7b6c;
+    border-radius: 20px;
+    margin: 8px;
+    box-shadow:
+      4px 0 20px rgba(10, 123, 108, 0.3),
+      inset -2px 0 8px rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+  .clay-nav-item {
+    color: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    transition: all 150ms ease;
+  }
+  .clay-nav-item:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .clay-nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .clay-tag-positive {
+    background-color: #e8ffe8;
+    color: #2d7a2d;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+  }
+  .clay-tag-negative {
+    background-color: #ffe8e8;
+    color: #c0392b;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+  }
+  .clay-action-bar {
+    background-color: #0a7b6c;
+    border-radius: 12px;
+    box-shadow:
+      0 6px 16px rgba(10, 123, 108, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  .clay-badge {
+    border-radius: 20px;
+    background-color: #0a7b6c;
+    color: #ffffff;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
   }
 }
