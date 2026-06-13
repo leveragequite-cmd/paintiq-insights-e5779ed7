@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 
 type ExtractInput = {
   kind: "stock" | "sales" | "expenses";
-  // For excel: pre-parsed CSV-ish text. For image: base64 data URL.
   source: "excel" | "image";
   text?: string;
   imageBase64?: string;
@@ -43,13 +42,13 @@ const SCHEMAS: Record<ExtractInput["kind"], string> = {
 export const extractDataFromFile = createServerFn({ method: "POST" })
   .inputValidator((data: ExtractInput) => data)
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
     const schema = SCHEMAS[data.kind];
     const today = new Date().toISOString().slice(0, 10);
 
-    const systemPrompt = `You are an OCR + structured-data extraction engine for a paint retail shop.
+    const prompt = `You are an OCR + structured-data extraction engine for a paint retail shop.
 Extract ${data.kind} records from the provided content.
 Return ONLY valid JSON in the shape: { "rows": [...] }.
 ${schema}
@@ -60,52 +59,51 @@ Rules:
 - If a field is missing, infer a sensible default (empty string for text, 0 for number).
 - Do NOT wrap in markdown code fences.`;
 
-    const userContent: any[] = [];
+    // Build Gemini parts
+    const parts: any[] = [];
+
     if (data.source === "excel" && data.text) {
-      userContent.push({
-        type: "text",
-        text: `Here is the spreadsheet content (CSV-like):\n\n${data.text.slice(0, 60000)}`,
-      });
+      parts.push({ text: prompt + `\n\nHere is the spreadsheet content:\n\n${data.text.slice(0, 60000)}` });
     } else if (data.source === "image" && data.imageBase64) {
-      userContent.push({ type: "text", text: "Extract the data from this image." });
-      userContent.push({
-        type: "image_url",
-        image_url: { url: `data:${data.imageMimeType || "image/png"};base64,${data.imageBase64}` },
+      parts.push({ text: prompt + "\n\nExtract the data from this image." });
+      parts.push({
+        inline_data: {
+          mime_type: data.imageMimeType || "image/png",
+          data: data.imageBase64,
+        },
       });
     } else {
       throw new Error("No content supplied");
     }
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userContent },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.1 },
+        }),
+      }
+    );
 
     if (!resp.ok) {
       const txt = await resp.text();
       if (resp.status === 429) throw new Error("Rate limit hit. Please try again in a minute.");
-      if (resp.status === 402) throw new Error("AI credits exhausted. Add credits in your Lovable workspace.");
-      throw new Error(`AI gateway error (${resp.status}): ${txt.slice(0, 300)}`);
+      if (resp.status === 403) throw new Error("Invalid Gemini API key. Check your GEMINI_API_KEY.");
+      throw new Error(`Gemini API error (${resp.status}): ${txt.slice(0, 300)}`);
     }
 
     const json = await resp.json();
-    const content: string = json.choices?.[0]?.message?.content ?? "{}";
+    const rawText: string = json.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+
     let parsed: { rows?: any[] } = {};
     try {
-      parsed = JSON.parse(content);
+      const clean = rawText.replace(/```json|```/g, "").trim();
+      parsed = JSON.parse(clean);
     } catch {
-      const m = content.match(/\{[\s\S]*\}/);
+      const m = rawText.match(/\{[\s\S]*\}/);
       if (m) parsed = JSON.parse(m[0]);
     }
 
