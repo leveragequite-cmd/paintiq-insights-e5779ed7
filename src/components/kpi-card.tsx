@@ -13,14 +13,14 @@ export function KpiCard({ label, value, change, icon: Icon, intent = "neutral" }
   const isUp = (change ?? 0) >= 0;
   const valueClass =
     intent === "positive" ? "text-primary" : intent === "critical" ? "text-destructive" : "text-foreground";
-  const trendClass = isUp ? "text-primary" : "text-destructive";
+  const trendClass = isUp ? "text-[color:var(--positive)]" : "text-destructive";
 
   return (
     <div className="surface-card p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
         {Icon && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-muted-foreground">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]">
             <Icon className="h-4 w-4" />
           </div>
         )}
